@@ -1,4 +1,5 @@
 #include<iostream>
+#include<cstring>
 
 const unsigned MAX_LEN = 1024;
 
