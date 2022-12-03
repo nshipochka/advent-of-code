@@ -1,9 +1,28 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <algorithm>
 
 using std::vector;
 using std::string;
+
+long findEntriesThree(vector<int> arr){
+    size_t l, r, arr_size = arr.size();
+    std::sort(arr.begin(), arr.end());
+
+    for (size_t i = 0; i < arr_size - 2; i++) {
+        l = i + 1;
+        r = arr_size - 1;
+        while (l < r) {
+            if (arr[i] + arr[l] + arr[r] == 2020) 
+                return arr[i]*arr[l]*arr[r];
+
+            if (arr[i] + arr[l] + arr[r] < 2020) l++;
+            else r--;
+        }
+    }
+    return 0;
+}
 
 int findEntries(vector<int> nums){
     for(vector<int>::iterator i = nums.begin();  i != nums.end(); ++i)
@@ -28,5 +47,5 @@ int main(){
 
     vector<int> v;
     input(v);
-    std::cout << findEntries(v);
+    std::cout << findEntriesThree(v);
 }
