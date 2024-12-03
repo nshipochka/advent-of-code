@@ -69,7 +69,7 @@ int get_safe_count(const vector<vector<int>>& reports) {
 
 
 int main() {
-	std::ifstream in("day2-input.txt");
+	std::ifstream in("../input_files/day-02-input.txt");
 	if (!in) {
 		std::cerr << "Error: Unable to open file.\n";
 		return 1;

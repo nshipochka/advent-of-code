@@ -45,7 +45,7 @@ int get_similarity(vector<int>& left, vector<int>& right) {
 }
 
 int main() {
-	std::ifstream in("in.txt");
+	std::ifstream in("../input_files/day-01-input.txt");
 	if (!in) {
 		std::cerr << "Error: Unable to open file.\n";
 		return 1;
