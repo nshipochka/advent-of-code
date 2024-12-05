@@ -56,26 +56,31 @@ def is_valid_document_strong(fields):
 
 
 
-def extract_documents(filename):
-    documents = []
-    with open(filename, 'r') as file:
-        current_document = []
-        for line in file:
-            stripped = line.strip()
-            if stripped:
-                current_document.extend(line.split())
-            else:
-                current_document.sort()
-                documents.append(current_document[:])
-                current_document.clear()
+# def extract_documents(filename):
+#     documents = []
+#     with open(filename, 'r') as file:
+#         current_document = []
+#         for line in file:
+#             stripped = line.strip()
+#             if stripped:
+#                 current_document.extend(line.split())
+#             else:
+#                 current_document.sort()
+#                 documents.append(current_document[:])
+#                 current_document.clear()
 
-    if current_document:
-            documents.append(current_document[:])
+#     if current_document:
+#             documents.append(current_document[:])
 
-    return documents
+#     return documents
                 
 
-documents = extract_documents("day-04.txt")
+# data = extract_documents("day-04.txt")
 
-print(sum(map(is_valid_document, documents)))
-print(sum(map(is_valid_document_strong, documents)))
+# this does the same job
+data = open("day-04.txt").read().strip().split("\n\n")
+data = [record.split() for record in data]
+
+print(sum(map(is_valid_document, data)))
+print(sum(map(is_valid_document_strong, data)))
+
