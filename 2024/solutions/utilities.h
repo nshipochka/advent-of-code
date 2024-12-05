@@ -23,6 +23,23 @@ std::ifstream open_file(const std::string& day) {
 }
 
 /*
+	Parses a csv string into a vector<int>
+*/
+std::vector<int> to_vector(const std::string& input) {
+	std::stringstream ss(input);
+
+	std::vector<int> v;
+	std::string token;
+	size_t index = 0;
+
+	while (getline(ss, token, ',')) {
+		v.push_back(stoi(token));
+	}
+
+	return v;
+}
+
+/*
 	Splits the string into characters
 */
 std::vector<char> split_to_chars(const std::string& str) {
@@ -31,6 +48,20 @@ std::vector<char> split_to_chars(const std::string& str) {
 	
 	char token;
 	while (ss.get(token))
+		tokens.push_back(token);
+
+	return tokens;
+}
+
+/*
+	Splits the string into tokens
+*/
+std::vector<std::string> split_to_tokens(const std::string& str, char delim) {
+	std::vector<std::string> tokens;
+	std::stringstream ss(str);
+
+	std::string token;
+	while (getline(ss, token, delim))
 		tokens.push_back(token);
 
 	return tokens;
