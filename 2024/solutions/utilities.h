@@ -6,9 +6,11 @@
 #include<string>
 #include<vector>
 #include<sstream>
+#include<algorithm>
 
 using std::vector;
 using std::string;
+using std::pair;
 
 /*
 	<day> has one of the following formats:
