@@ -44,6 +44,20 @@ std::vector<int> to_vector(const std::string& input) {
 	return v;
 }
 
+std::vector<int> to_vector_delim(const std::string& input, char delim) {
+	std::stringstream ss(input);
+
+	std::vector<int> v;
+	std::string token;
+	size_t index = 0;
+
+	while (getline(ss, token, delim)) {
+		v.push_back(stoi(token));
+	}
+
+	return v;
+}
+
 /*
 	Splits the string into characters
 */
