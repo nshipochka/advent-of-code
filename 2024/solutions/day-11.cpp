@@ -9,115 +9,79 @@ using std::vector;
 using std::string;
 using std::unordered_map;
 
-// Dictionary to cache results
-unordered_map<string, vector<string>> cache;
+std::pair<long long, long long> split_stone(long long stone, size_t half) {
+	string st = std::to_string(stone);
 
-void remove_leading_zeros(string& input_str) {
-    input_str = std::to_string(stoll(input_str));  // Convert to number and back to string to remove leading zeros
+	string left_half = st.substr(0, half);
+	string right_half = st.substr(half);
+
+	return { stoll(left_half), stoll(right_half) };
 }
 
-std::pair<string, string> split_stone(const string& stone, size_t half) {
-    string left_half = stone.substr(0, half);
-    string right_half = stone.substr(half);
+void blink(unordered_map<long long, long long>& stones) {
+	unordered_map<long long, long long> updated_stones;
 
-    remove_leading_zeros(left_half);
-    remove_leading_zeros(right_half);
+	for (auto& [stone, count] : stones) {
+		int digits = (int)log10(stone) + 1;
 
-    return { left_half, right_half };
-}
+		if (stone == 0) {
+			updated_stones[1] += count;
+		}
+		else if (digits % 2 == 0) {
+			auto split = split_stone(stone, digits / 2);
+			updated_stones[split.first] += count;
+			updated_stones[split.second] += count;
 
-string multiply_string_by_int(const string& number, int multiplier) {
-   /* string result = "";
-    int carry = 0;
-
-    for (auto rit = number.rbegin(); rit != number.rend(); ++rit) {
-        int digit = (*rit - '0') * multiplier + carry;
-        result.push_back((digit % 10) + '0');
-        carry = digit / 10;
-    }
-
-    while (carry > 0) {
-        result.push_back((carry % 10) + '0');
-        carry /= 10;
-    }
-
-    std::reverse(result.begin(), result.end());*/
-
-    long long result = stoll(number) * multiplier;
-    return std::to_string(result);
-}
-
-// Blink once with caching
-void blink(std::vector<string>& stones) {
-    vector<string> updated_stones;
-    for (auto& stone : stones) {
-        vector<string> result;
-        // Check if the result of this stone is already cached
-        if (cache.find(stone) != cache.end()) {
-            result = cache[stone];
-        
-        }
-        else {
-
-            size_t digits = stone.size();
-
-            if (stone == "0") {
-                result.push_back("1");
-            }
-            else if (digits % 2 == 0) {
-                auto split = split_stone(stone, digits / 2);
-                result.push_back(split.first);
-                result.push_back(split.second);
-
-            }
-            else {
-                string multiplied = multiply_string_by_int(stone, 2024);
-                result.push_back(multiplied);
-            }
-
-            cache[stone] = result;
-        }
-
-        updated_stones.insert(updated_stones.end(), result.begin(), result.end());
-    }
-
-    stones = std::move(updated_stones);  // Move the updated stones back into the original container
+		}
+		else {
+			long long multiplied = stone * 2024;
+			updated_stones[multiplied] += count;
+		}
+	}
+	std::swap(updated_stones, stones);
 }
 
 // Blink n times
-void blink(vector<string>& stones, int n) {
-    for (int i = 0; i < n; ++i) {
-        blink(stones);
-        /*for (const auto& v : stones) {
-            std::cout << v << " ";
-        }
-        std::cout << std::endl;*/
-    }
+void blink(unordered_map<long long, long long>& stones, int n) {
+	for (int i = 0; i < n; ++i) {
+		blink(stones);
+		/*for (auto [stone, cnt] : stones)
+			for (int i = 0; i < cnt; ++i)
+				std::cout << stone << " ";
+
+		std::cout << std::endl;*/
+	}
+}
+
+long long count_stones(const unordered_map<long long, long long>& stones) {
+	long long count = 0;
+	for (auto [stone, cnt] : stones)
+		count += cnt;
+
+	return count;
 }
 
 int main() {
-    std::ifstream in = open_file("11");
-    if (!in) return 1;
+	std::ifstream in = open_file("11");
+	if (!in) return 1;
 
-    string input;
-    getline(in, input);
+	string input;	
+	getline(in, input);
 
-    vector<string> vec;
-    std::stringstream stream(input);
-    string stone;
+	unordered_map<long long, long long> stones;
+	std::stringstream stream(input);
+	string stone;
 
-    while (stream >> stone) {
-        vec.push_back(stone);
-    }
+	while (stream >> stone)
+		stones[stoll(stone)]++;
 
-    for (const auto& v : vec) {
-        std::cout << v << " ";
-    }
-    std::cout << std::endl;
+	for (const auto& [stone, count] : stones)
+		std::cout << stone << " ";
+	std::cout << std::endl;
 
-    blink(vec, 25);
-    std::cout << vec.size() << std::endl;
+	blink(stones, 75);
+	std::cout << count_stones(stones) << std::endl;
 
-    in.close();
-    return 0;
+	in.close();
+	return 0;
 }
