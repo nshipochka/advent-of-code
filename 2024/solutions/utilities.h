@@ -19,10 +19,10 @@ class Direction {
 public:
 	enum class Type {
 		NONE,
-		DOWN,
-		UP,
-		LEFT,
 		RIGHT,
+		DOWN,
+		LEFT,
+		UP,
 		DOWN_RIGHT,
 		DOWN_LEFT,
 		UP_RIGHT,
@@ -45,6 +45,17 @@ public:
 		return Direction(dx * scalar, dy * scalar, Type::NONE); // Type becomes NONE after scaling
 	}
 
+	Direction flip() {
+		switch (type) {
+		case Type::UP: return all_directions()[(size_t)Type::DOWN];
+		case Type::DOWN: return all_directions()[(size_t)Type::UP];
+		case Type::LEFT: return all_directions()[(size_t)Type::RIGHT];
+		case Type::RIGHT: return all_directions()[(size_t)Type::LEFT];
+		default:
+			return *this;
+		}
+	}
+
 	bool operator==(const Direction& other) const {
 		return dx == other.dx && dy == other.dy;
 	}
@@ -58,10 +69,10 @@ public:
 	static const std::array<Direction, static_cast<size_t>(Type::NUM_DIRECTIONS)>& all_directions() {
 		static const std::array<Direction, static_cast<size_t>(Type::NUM_DIRECTIONS)> directions = {
 			Direction(0, 0, Type::NONE),       // NONE
-			Direction(1, 0, Type::DOWN),       // DOWN
-			Direction(-1, 0, Type::UP),        // UP
-			Direction(0, -1, Type::LEFT),      // LEFT
 			Direction(0, 1, Type::RIGHT),      // RIGHT
+			Direction(1, 0, Type::DOWN),       // DOWN
+			Direction(0, -1, Type::LEFT),      // LEFT
+			Direction(-1, 0, Type::UP),        // UP
 			Direction(1, 1, Type::DOWN_RIGHT), // DOWN_RIGHT
 			Direction(1, -1, Type::DOWN_LEFT), // DOWN_LEFT
 			Direction(-1, 1, Type::UP_RIGHT),  // UP_RIGHT
@@ -71,20 +82,22 @@ public:
 	}
 };
 
+
+
 // Point structure
 struct Point {
-	size_t x, y;
+	int x, y;
 
-	Point(size_t x = 0, size_t y = 0) : x(x), y(y) {}
+	Point(int x = 0, int y = 0) : x(x), y(y) {}
 
-	bool is_within_range(size_t width, size_t height) const {
-		return x < width && y < height; // size_t is always >= 0
+	bool is_within_range(int width, int height, int min_x = 0, int min_y = 0) const {
+		return x < width && y < height && x >= min_x && y >= min_y;
 	}
 
 	// Move the point in a specified direction
 	void move(const Direction& dir) {
-		x = static_cast<size_t>(x + dir.dx); // Ensure no negative values
-		y = static_cast<size_t>(y + dir.dy);
+		x = x + dir.dx;
+		y = y + dir.dy;
 	}
 
 	// Move using DirectionType
@@ -106,19 +119,6 @@ struct Point {
 	}
 };
 
-//	<day> has one of the following formats:
-// - 0x if x is < 10
-//	- x if x is >= 10
-//	- 0x-test or x-test if we want to use the sample input
-std::ifstream open_file(const std::string& day) {
-	std::string filename("../input-files/day-" + day + "-input.txt");
-	std::ifstream in(filename);
-	if (!in)
-		std::cerr << "Error: Unable to open file.\n";
-
-	return in;
-}
-
 // Matrix class
 template <typename T>
 class Matrix {
@@ -129,9 +129,14 @@ private:
 	std::vector<std::vector<T>> data;
 
 public:
+	Matrix() {}
 	// Constructor to initialize matrix with given dimensions and default value
 	Matrix(size_t rows, size_t cols, const T& default_value = T())
 		: data(rows, std::vector<T>(cols, default_value)) {
+	}
+
+	void push_back(const std::vector<T>& v) {
+		data.push_back(v);
 	}
 
 	// Access operator using Point
@@ -155,6 +160,10 @@ public:
 	// Other utility functions like dimensions
 	size_t rows() const { return data.size(); }
 	size_t cols() const { return data.empty() ? 0 : data[0].size(); }
+
+	bool empty() const {
+		return data.empty();
+	}
 
 	friend std::ostream& operator<<(std::ostream& os, const Matrix<T>& matrix) {
 		for (const auto& row : matrix.data) {
@@ -219,4 +228,16 @@ Matrix<T> input_matrix(std::ifstream& in, const Function& split) {
 	return m;
 }
 
+//	<day> has one of the following formats:
+// - 0x if x is < 10
+//	- x if x is >= 10
+//	- 0x-test or x-test if we want to use the sample input
+std::ifstream open_file(const std::string& day) {
+	std::string filename("../input-files/day-" + day + "-input.txt");
+	std::ifstream in(filename);
+	if (!in)
+		std::cerr << "Error: Unable to open file.\n";
+
+	return in;
+}
 #endif
