@@ -27,7 +27,8 @@ public:
 		DOWN_LEFT,
 		UP_RIGHT,
 		UP_LEFT,
-		NUM_DIRECTIONS // Tracks the number of directions
+		NUM_DIRECTIONS, // Tracks the number of directions
+		HALF_DIRECTIONS = 4
 	};
 
 	int dx, dy;
@@ -35,6 +36,18 @@ public:
 
 	Direction(int dx = 0, int dy = 0, Type type = Type::NONE)
 		: dx(dx), dy(dy), type(type) {
+	}
+
+	Direction(const Direction& other) {
+		dx = other.dx;
+		dy = other.dy;
+		type = other.type;
+	}
+
+	Direction(Direction&& other) {
+		dx = other.dx;
+		dy = other.dy;
+		type = other.type;
 	}
 
 	Direction operator+(const Direction& other) const {
@@ -65,6 +78,14 @@ public:
 			<< " (" << dir.dx << ", " << dir.dy << ")";
 	}
 
+	template<typename T>
+	Direction& operator*=(T scalar) {
+		dx *= scalar;
+		dy *= scalar;
+
+		return *this;
+	}
+
 	// Static utility function to get all directions
 	static const std::array<Direction, static_cast<size_t>(Type::NUM_DIRECTIONS)>& all_directions() {
 		static const std::array<Direction, static_cast<size_t>(Type::NUM_DIRECTIONS)> directions = {
@@ -85,10 +106,11 @@ public:
 
 
 // Point structure
+template <typename T>
 struct Point {
-	int x, y;
+	T x, y;
 
-	Point(int x = 0, int y = 0) : x(x), y(y) {}
+	Point(T x = 0, T y = 0) : x(x), y(y) {}
 
 	bool is_within_range(int width, int height, int min_x = 0, int min_y = 0) const {
 		return x < width && y < height && x >= min_x && y >= min_y;
@@ -114,10 +136,36 @@ struct Point {
 		return !(*this == other);
 	}
 
+	friend T get_distance(const Point& a, const Point& b) {
+		return std::sqrt(std::pow((b.x - a.x), 2) + std::pow((b.y - a.y), 2));
+	}
+
+	friend bool operator<(const Point& a, const Point& b) {
+		if (a.x != b.x)
+			return (a.x < b.x);
+		else
+			return (a.y < b.y);
+	}
+
 	friend std::ostream& operator<<(std::ostream& os, const Point& point) {
 		return os << "(" << point.x << ", " << point.y << ")";
 	}
+
+	friend Point operator+(const Point& lhs, const Point& rhs) {
+		return Point(lhs.x + rhs.x, lhs.y + rhs.y);
+	}
+
+	Point& operator/(int scalar) {
+		x /= 2;
+		y /= 2;
+		return *this;
+	}
 };
+
+template <typename T>
+Point<T> to_point(const Direction& d) {
+	return Point(d.dx, d.dy);
+}
 
 // Matrix class
 template <typename T>
@@ -140,11 +188,13 @@ public:
 	}
 
 	// Access operator using Point
-	T& operator[](const Point& p) {
+	template <typename T>
+	T& operator[](const Point<T>& p) {
 		return data[p.x][p.y];
 	}
 
-	const T& operator[](const Point& p) const {
+	template <typename T>
+	const T& operator[](const Point<T>& p) const {
 		return data[p.x][p.y];
 	}
 
